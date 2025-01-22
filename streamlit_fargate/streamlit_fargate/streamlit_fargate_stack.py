@@ -1,3 +1,4 @@
+import os
 from aws_cdk import (
     aws_ecs as ecs,
     aws_ec2 as ec2,
@@ -14,6 +15,14 @@ class StreamlitFargateStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
+        # Current directory path
+        current_directory = os.path.dirname(os.path.realpath(__file__))
+
+        # Build Dockerfile from local folder and push to ECR
+        image = ecs.ContainerImage.from_asset(
+            os.path.join(current_directory, "docker_lambda")
+        )
+
         # Create a VPC for the ECS Cluster
         vpc = ec2.Vpc(
             self, "StreamlitFargateVpc", max_azs=1  # Default is all AZs in the region
@@ -21,9 +30,6 @@ class StreamlitFargateStack(Stack):
 
         # Create an ECS Cluster
         cluster = ecs.Cluster(self, "StreamlitFargateCluster", vpc=vpc)
-
-        # Build Dockerfile from local folder and push to ECR
-        image = ecs.ContainerImage.from_asset("docker_app")
 
         # Define a Fargate Task Definition and Service
         fargate_service = ecs_patterns.ApplicationLoadBalancedFargateService(
