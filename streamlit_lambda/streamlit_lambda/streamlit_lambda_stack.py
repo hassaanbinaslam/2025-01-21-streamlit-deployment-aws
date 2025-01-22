@@ -1,3 +1,4 @@
+import os
 from aws_cdk import aws_lambda as _lambda, Stack, CfnOutput
 from constructs import Construct
 
@@ -7,11 +8,17 @@ class StreamlitLambdaStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
+        # Current directory path
+        current_directory = os.path.dirname(os.path.realpath(__file__))
+
+        # Docker image
+        image_path = _lambda.DockerImageCode.from_image_asset(
+            os.path.join(current_directory, "docker_lambda")
+        )
+
         # Define the Lambda function using a Docker image
         docker_lambda = _lambda.DockerImageFunction(
-            self,
-            "DockerLambdaFunction",
-            code=_lambda.DockerImageCode.from_image_asset("docker_lambda"),
+            self, "DockerLambdaFunction", code=image_path
         )
 
         # Add a Function URL to the Lambda function
