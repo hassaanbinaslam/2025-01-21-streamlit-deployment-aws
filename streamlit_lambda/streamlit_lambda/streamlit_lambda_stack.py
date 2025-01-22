@@ -1,19 +1,27 @@
-from aws_cdk import (
-    # Duration,
-    Stack,
-    # aws_sqs as sqs,
-)
+from aws_cdk import aws_lambda as _lambda, Stack, CfnOutput
 from constructs import Construct
+
 
 class StreamlitLambdaStack(Stack):
 
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        # The code that defines your stack goes here
+        # Define the Lambda function using a Docker image
+        docker_lambda = _lambda.DockerImageFunction(
+            self,
+            "DockerLambdaFunction",
+            code=_lambda.DockerImageCode.from_image_asset("docker_lambda"),
+        )
 
-        # example resource
-        # queue = sqs.Queue(
-        #     self, "StreamlitLambdaQueue",
-        #     visibility_timeout=Duration.seconds(300),
-        # )
+        # Add a Function URL to the Lambda function
+        function_url = docker_lambda.add_function_url(
+            auth_type=_lambda.FunctionUrlAuthType.NONE,  # No authentication (public)
+        )
+
+        CfnOutput(
+            self,
+            "LambdaFunctionUrl",
+            value=function_url.url,
+            description="The URL of the Lambda Function",
+        )
