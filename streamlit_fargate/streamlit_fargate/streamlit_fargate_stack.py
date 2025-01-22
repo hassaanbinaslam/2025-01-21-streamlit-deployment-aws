@@ -20,7 +20,7 @@ class StreamlitFargateStack(Stack):
 
         # Build Dockerfile from local folder and push to ECR
         image = ecs.ContainerImage.from_asset(
-            os.path.join(current_directory, "docker_lambda")
+            os.path.join(current_directory, "docker_app")
         )
 
         # Create a VPC for the ECS Cluster
