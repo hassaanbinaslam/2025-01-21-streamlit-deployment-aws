@@ -25,7 +25,9 @@ class StreamlitFargateStack(Stack):
 
         # Create a VPC for the ECS Cluster
         vpc = ec2.Vpc(
-            self, "StreamlitFargateVpc", max_azs=1  # Default is all AZs in the region
+            self,
+            "StreamlitFargateVpc",
+            max_azs=2,  # Min=2. Default is all AZs in the region
         )
 
         # Create an ECS Cluster
